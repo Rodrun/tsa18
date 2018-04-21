@@ -19,6 +19,7 @@ import argparse
 import pygame
 
 from soccer import Soccer
+from hockey import Hockey
 import util
 
 
@@ -49,8 +50,10 @@ if gamemode == 0: # soccer
     goal_rect = pygame.rect.Rect((width / 6, height / 5), (width - (width // 3), height // 3))
     soccer = Soccer(goal_rect, width, height, serif_font)
 elif gamemode == 1: # hockey
-    hockey = None
-
+    hockey = Hockey(width, height, serif_font, WIN_POINTS)
+    hockey_inst = util.text_sized(font=serif_font, s="Press space when puck reaches circle!", w=width// 3, h=height // 8, col=(0, 0, 0), bg=(255, 255, 255))
+    hockey_inst.get_rect().y = height - hockey_inst.get_rect().height
+    gamemode = 555
 # win loss images
 retry_img = util.load_sized("resource/retry.png", width, height)
 win_img = util.load_sized("resource/win.png", width, height)
@@ -70,7 +73,6 @@ while True:
                 sys.exit(0)
             elif event.key == pygame.K_SPACE:
                 space_action = True
-                print("space_action triggered")
     
     if gamemode == 0:
         soccer.space_action = space_action
@@ -82,6 +84,11 @@ while True:
     elif gamemode == 1:
         hockey.space_action = space_action
         hockey.update(dt)
+        if hockey.get_points() == WIN_POINTS:
+            space_action = False
+            gamemode = 3
+        elif hockey.lost:
+            gamemode = 2
     if gamemode == 2:
         if space_action:
             if originalgm == 0:
@@ -89,15 +96,21 @@ while True:
             else:
                 hockey.reset()
             gamemode = originalgm
+    elif gamemode == 3:  # win
+        if space_action:
+            sys.exit(0)
+    elif gamemode == 555:
+        if space_action:
+            gamemode = 1
 
 
     screen.fill((255, 255, 255))
     if gamemode == 0:  # Soccer
         screen.blit(background, background.get_rect())
         soccer.draw(screen)
-    elif gamemode == 1:  # Hockey
-        pass
-        #screen.blit(background, background.get_rect())
+    elif gamemode == 1 or gamemode == 555:  # Hockey
+        hockey.draw(screen)
+        screen.blit(hockey_inst, hockey_inst.get_rect())
     elif gamemode == 2:  # retry
         screen.blit(retry_img, retry_img.get_rect())
     elif gamemode == 3:  # win

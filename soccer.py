@@ -82,7 +82,7 @@ class Soccer:
         self.dramatic = DramaticText(w, h, font)
         self.press_space = BlinkingMessage(font, "PRESS SPACE! ", 100, 100,
                                       w // 8, h // 11)
-        self.score_table = BlinkingMessage(font, "SCORE: 0 | MISS: 0", w / 2, h, w // 5, h // 11)
+        self.score_table = BlinkingMessage(font, "SCORE: 0 | MISS: 0", w / 2, 100, h // 5, h // 11)
 
     def update(self, delta=1):
         self.dramatic.update()
